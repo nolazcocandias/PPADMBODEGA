@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <title>Ingreso OT</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 20px;
+      background-color: #f6f8fa;
+      color: #24292e;
+    }
+
+    .fixed-header {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      background-color: #fff;
+      padding: 10px 0;
+      z-index: 1000;
+      border-bottom: 1px solid #d1d5da;
+      box-shadow: 0 1px 3px rgba(27,31,35,0.12);
+      margin-bottom: 20px;
+    }
+
+    .table-container {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 80px;
+      border: 1px solid #d1d5da;
+      border-radius: 6px;
+      background-color: #fff;
+      box-shadow: 0 1px 3px rgba(27,31,35,0.12), 0 8px 24px rgba(27,31,35,0.12);
+      position: relative;
+    }
+
+    .table-container thead th {
+      position: sticky;
+      top: 0;
+      background-color: #fff;
+      z-index: 1;
+    }
+
+    .form-header {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      background-color: #fff;
+      padding: 20px;
+      border: 1px solid #d1d5da;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(27,31,35,0.12);
+      margin-bottom: 20px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th,
+    .data-table td {
+      border: 1px solid #e1e4e8;
+      padding: 4px;
+      text-align: left;
+      vertical-align: middle;
+      font-size: 12px;
+    }
+
+    .data-table th {
+      background-color: #f6f8fa;
+      font-weight: bold;
+      text-align: center;
+      padding: 8px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 4px;
+      margin: 0;
+      border: 1px solid #d1d5da;
+      border-radius: 6px;
+      font-size: 12px;
+      background-color: #fafbfc;
+      color: #24292e;
+      height: 30px;
+      box-sizing: border-box;
+    }
+
+    .number-input {
+      width: 60px;
+      padding: 2px;
+      height: 30px;
+      box-sizing: border-box;
+    }
+
+    .sku, .ubicacion-bloqueada, .unidades-x-ubicacion, .sku-origen {
+      background-color: #e1e4e8;
+      color: #24292e;
+      pointer-events: none;
+    }
+
+    .add-row-button {
+      background-color: #2ea44f;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(27,31,35,0.12);
+    }
+
+    .remove-row-button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+    }
+
+    .fixed-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #fff;
+      padding: 10px 20px;
+      border-top: 1px solid #d1d5da;
+      box-shadow: 0 -1px 3px rgba(27,31,35,0.12);
+      z-index: 1000;
+      box-sizing: border-box;
+    }
+
+    .footer-buttons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+
+    .fixed-footer button {
+      background-color: #2ea44f;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .fixed-footer button:hover {
+      background-color: #2c974b;
+    }
+
+    .swal2-popup {
+      font-size: 14px !important;
+      padding: 16px !important;
+      background-color: #fff !important;
+      color: #24292e !important;
+      border: 1px solid #d1d5da !important;
+      border-radius: 6px !important;
+      width: 300px !important;
+    }
+
+    .swal2-title {
+      font-size: 18px !important;
+    }
+
+    .swal2-content {
+      font-size: 14px !important;
+    }
+
+    .swal2-styled.swal2-confirm {
+      background-color: #2ea44f !important;
+      border: 1px solid rgba(27,31,35,0.15) !important;
+      color: #fff !important;
+      padding: 6px 12px !important;
+      font-size: 12px !important;
+    }
+
+    .swal2-styled.swal2-cancel {
+      background-color: #d1d5da !important;
+      color: #24292e !important;
+      padding: 6px 12px !important;
+      font-size: 12px !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="fixed-header">
+    <h1 style="font-size: 18px; margin: 0; font-weight: normal;">Selecciona Productos</h1>
+  </div>
+
+  <form id="formIngreso">
+    <div class="form-header">
+      <div>
+        <label for="fecha">Fecha:</label>
+        <input type="date" id="fecha" required>
+      </div>
+      <div>
+        <label for="oc">OT:</label>
+        <input type="text" id="oc" placeholder="N° OT" minlength="3" required>
+      </div>
+      <div>
+        <label for="cliente">Cliente:</label>
+        <input type="text" id="cliente" placeholder="Nombre Cliente" required>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>SKU Origen</th>
+            <th>SKU</th>
+            <th>Descripción</th>
+            <th>Maximo a Producir</th>
+            <th>Ubicación</th>
+            <th>Unidades a Utilizar</th>
+            <th>Eliminar</th>
+          </tr>
+        </thead>
+        <tbody id="productosTableBody"></tbody>
+      </table>
+    </div>
+  </form>
+
+  <div class="fixed-footer">
+    <div>
+      <button type="button" class="add-row-button" onclick="agregarFila()">+</button>
+    </div>
+    <div class="footer-buttons">
+      <button type="button" onclick="enviarFormulario()">Guardar</button>
+    </div>
+  </div>
+
+  <script>
+    let ubicacionesPorSKU = {};
+    let maximosPorUbicacion = {};
+
+    function establecerFechaActual() {
+      const ahora = new Date();
+      const anio = ahora.getFullYear();
+      const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+      const dia = String(ahora.getDate()).padStart(2, '0');
+      const fechaFormateada = `${anio}-${mes}-${dia}`;
+      document.getElementById('fecha').value = fechaFormateada;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      establecerFechaActual();
+      agregarFila();
+      google.script.run
+        .withSuccessHandler((ubicaciones) => {
+          if (ubicaciones && typeof ubicaciones === 'object') {
+            ubicacionesPorSKU = ubicaciones;
+          } else {
+            ubicacionesPorSKU = {};
+            Swal.fire('Error', 'No se pudieron cargar las ubicaciones', 'error');
+          }
+        })
+        .withFailureHandler((error) => {
+          ubicacionesPorSKU = {};
+          Swal.fire('Error', 'Error al cargar ubicaciones: ' + error.message, 'error');
+        })
+        .llenarListaUbicacionesOC();
+
+      google.script.run
+        .withSuccessHandler((maximos) => {
+          if (maximos && typeof maximos === 'object') {
+            maximosPorUbicacion = maximos;
+          } else {
+            maximosPorUbicacion = {};
+            Swal.fire('Error', 'No se pudieron cargar los máximos por ubicación', 'error');
+          }
+        })
+        .withFailureHandler((error) => {
+          maximosPorUbicacion = {};
+          Swal.fire('Error', 'Error al cargar los máximos por ubicación: ' + error.message, 'error');
+        })
+        .obtenerMaximosPorUbicacion();
+    });
+
+    function cargarOpcionesUbicacion(select, ubicaciones) {
+      select.innerHTML = '<option value="" disabled selected>-- Selecciona una ubicación --</option>';
+      ubicaciones.forEach(ubicacion => {
+        const opt = document.createElement("option");
+        opt.value = ubicacion;
+        opt.textContent = ubicacion;
+        select.appendChild(opt);
+      });
+    }
+
+    function agregarFila() {
+      const tbody = document.getElementById('productosTableBody');
+      const newRow = document.createElement('tr');
+      newRow.innerHTML = `
+        <td>
+          <input type="text" class="sku-origen sku-origen-opaco" readonly>
+        </td>
+        <td>
+          <input type="text" class="sku" readonly>
+        </td>
+        <td>
+          <select class="descripcion" required onchange="actualizarSKU(this)">
+            <option value="" disabled selected>-- Selecciona un producto --</option>
+          </select>
+        </td>
+        <td>
+          <input type="number" class="unidades-x-ubicacion number-input unidades-x-ubicacion" readonly>
+        </td>
+        <td>
+          <select class="ubicacion ubicacion-bloqueada" required onchange="actualizarMaximoPorUbicacion(this)">
+            <option value="" disabled selected>-- Selecciona una ubicación --</option>
+          </select>
+        </td>
+        <td>
+          <input type="number" class="unidades number-input" min="1" required onchange="validarUnidades(this)">
+        </td>
+        <td style="text-align: center;">
+          <button type="button" class="remove-row-button" onclick="eliminarFila(this)">×</button>
+        </td>
+      `;
+      tbody.appendChild(newRow);
+
+      google.script.run
+        .withSuccessHandler((result) => {
+          cargarOpcionesEnSelector(newRow.querySelector('.descripcion'), result.opciones);
+        })
+        .obtenerOpcionesSMT('descripcion', 'IngresoOC');
+    }
+
+    function eliminarFila(button) {
+      const row = button.closest('tr');
+      if (document.querySelectorAll('#productosTableBody tr').length > 1) {
+        row.remove();
+      } else {
+        Swal.fire('Error', 'Debe mantener al menos una fila en la tabla', 'error');
+      }
+    }
+
+    function cargarOpcionesEnSelector(select, opciones) {
+      select.innerHTML = '<option value="" disabled selected>-- Selecciona un producto --</option>';
+      opciones.forEach(opcion => {
+        const opt = document.createElement("option");
+        opt.value = opcion;
+        opt.textContent = opcion;
+        select.appendChild(opt);
+      });
+    }
+
+    function actualizarSKU(selectElement) {
+      const fila = selectElement.closest('tr');
+      const descripcionSeleccionada = selectElement.value;
+      const skuInput = fila.querySelector('.sku');
+      const skuOrigenInput = fila.querySelector('.sku-origen');
+      const ubicacionSelect = fila.querySelector('.ubicacion');
+      const unidadesXUbicacionInput = fila.querySelector('.unidades-x-ubicacion');
+
+      if (descripcionSeleccionada) {
+        google.script.run
+          .withSuccessHandler((info) => {
+            if (info) {
+              skuInput.value = info;
+              ubicacionSelect.disabled = false;
+              ubicacionSelect.classList.remove('ubicacion-bloqueada');
+              google.script.run
+                .withSuccessHandler((skuOrigen) => {
+                  skuOrigenInput.value = skuOrigen;
+                  actualizarUbicaciones(skuOrigenInput);
+                  actualizarMaximoPorUbicacion(skuOrigenInput, unidadesXUbicacionInput);
+                })
+                .withFailureHandler((error) => {
+                  skuOrigenInput.value = '';
+                  unidadesXUbicacionInput.value = '';
+                  Swal.fire('Error', 'Error al obtener el SKU de origen: ' + error.message, 'error');
+                })
+                .buscarSkuOrigenEnMaestro(info);
+            } else {
+              skuInput.value = '';
+              skuOrigenInput.value = '';
+              unidadesXUbicacionInput.value = '';
+              ubicacionSelect.disabled = true;
+              ubicacionSelect.classList.add('ubicacion-bloqueada');
+              Swal.fire('Error', 'No se encontró el SKU para este producto', 'error');
+            }
+          })
+          .withFailureHandler((error) => {
+            skuInput.value = '';
+            skuOrigenInput.value = '';
+            unidadesXUbicacionInput.value = '';
+            ubicacionSelect.disabled = true;
+            ubicacionSelect.classList.add('ubicacion-bloqueada');
+            Swal.fire('Error', 'Error al obtener el SKU: ' + error.message, 'error');
+          })
+          .obtenerSKUSMT(descripcionSeleccionada);
+      } else {
+        skuInput.value = '';
+        skuOrigenInput.value = '';
+        unidadesXUbicacionInput.value = '';
+        ubicacionSelect.disabled = true;
+        ubicacionSelect.classList.add('ubicacion-bloqueada');
+      }
+    }
+
+    function actualizarUbicaciones(skuOrigenInput) {
+      const fila = skuOrigenInput.closest('tr');
+      const ubicacionSelect = fila.querySelector('.ubicacion');
+      const skuOrigen = skuOrigenInput.value;
+
+      if (ubicacionesPorSKU[skuOrigen]) {
+        cargarOpcionesUbicacion(ubicacionSelect, ubicacionesPorSKU[skuOrigen]);
+        ubicacionSelect.disabled = false;
+        ubicacionSelect.classList.remove('ubicacion-bloqueada');
+      } else {
+        ubicacionSelect.innerHTML = '<option value="" disabled selected>-- Selecciona una ubicación --</option>';
+        ubicacionSelect.disabled = true;
+        ubicacionSelect.classList.add('ubicacion-bloqueada');
+        Swal.fire('Error', 'No hay ubicaciones disponibles para el SKU de origen proporcionado', 'error');
+      }
+    }
+    
+    function actualizarMaximoPorUbicacion(selectElement) {
+      const fila = selectElement.closest('tr');
+      const ubicacion = selectElement.value;
+      const unidadesXUbicacionInput = fila.querySelector('.unidades-x-ubicacion');
+      const unidadesInput = fila.querySelector('.unidades');
+
+      if (maximosPorUbicacion[ubicacion]) {
+        unidadesXUbicacionInput.value = maximosPorUbicacion[ubicacion];
+        unidadesInput.max = maximosPorUbicacion[ubicacion];
+      } else {
+        unidadesXUbicacionInput.value = '';
+        unidadesInput.max = '';
+      }
+    }
+
+    function validarUnidades(inputElement) {
+      const fila = inputElement.closest('tr');
+      const maximoAProducir = parseInt(fila.querySelector('.unidades-x-ubicacion').value, 10);
+      const unidades = parseInt(inputElement.value, 10);
+
+      if (unidades > maximoAProducir) {
+        inputElement.value = maximoAProducir;
+        Swal.fire('Advertencia', 'La cantidad ingresada no puede ser mayor que el máximo a producir.', 'warning');
+      }
+    }
+
+    function enviarFormulario() {
+      const productos = [];
+      const filas = document.querySelectorAll('#productosTableBody tr');
+      filas.forEach(fila => {
+        const sku = fila.querySelector('.sku').value;
+        const descripcion = fila.querySelector('.descripcion').value;
+        const unidadesXUbicacion = fila.querySelector('.unidades-x-ubicacion').value;
+        const ubicacion = fila.querySelector('.ubicacion').value;
+        const unidades = fila.querySelector('.unidades').value;
+        const skuOrigen = fila.querySelector('.sku-origen').value;
+
+        if (sku && descripcion && unidadesXUbicacion && ubicacion && unidades) {
+          productos.push({
+            fecha: document.getElementById("fecha").value,
+            oc: document.getElementById("oc").value,
+            cliente: document.getElementById("cliente").value,
+            skuOrigen: skuOrigen,
+            sku: sku,
+            descripcion: descripcion,
+            maximoAProducir: parseInt(unidadesXUbicacion),
+            ubicacion: ubicacion,
+            unidades: parseInt(unidades)
+          });
+        }
+      });
+
+      if (!validarDatos(productos)) {
+        return false;
+      }
+
+      Swal.fire({
+        title: 'Confirmación',
+        text: `¿Guardar ingreso de ${productos.length} productos?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Guardar',
+        cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#2ea44f',
+        cancelButtonColor: '#d1d5da'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          google.script.run
+            .withSuccessHandler((response) => {
+              if (response.success) {
+                Swal.fire({
+                  title: '¡Guardado!',
+                  text: 'Los productos se ingresaron correctamente.',
+                  icon: 'success',
+                  confirmButtonColor: '#2ea44f'
+                }).then(() => {
+                  document.getElementById('formIngreso').reset();
+                  document.getElementById('productosTableBody').innerHTML = '';
+                  agregarFila();
+                  establecerFechaActual();
+                });
+              } else {
+                Swal.fire('Error', response.message || 'Error al guardar los datos', 'error');
+              }
+            })
+            .withFailureHandler((error) => {
+              Swal.fire('Error', error.message || 'Error al procesar la solicitud', 'error');
+            })
+            .guardarOCSMT(productos);
+        }
+      });
+
+      return false;
+    }
+
+    function validarDatos(productos) {
+      if (productos.length === 0) {
+        Swal.fire('Error', 'Debe ingresar al menos un producto', 'error');
+        return false;
+      }
+
+      for (let producto of productos) {
+        if (!producto.fecha || !producto.oc || !producto.cliente || !producto.skuOrigen || !producto.sku || !producto.descripcion || !producto.maximoAProducir || !producto.ubicacion || !producto.unidades) {
+          Swal.fire('Error', 'Complete todos los campos de productos', 'error');
+          return false;
+        }
+
+        if (producto.maximoAProducir <= 0 || producto.unidades <= 0) {
+          Swal.fire('Error', 'Las cantidades deben ser mayores a 0', 'error');
+          return false;
+        }
+
+        if (producto.unidades > producto.maximoAProducir) {
+          Swal.fire('Error', 'Las unidades a utilizar no pueden ser mayores que el máximo a producir', 'error');
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    function buscarSkuOrigenEnMaestro(sku) {
+      const hoja = SpreadsheetApp.openById(FSMT).getSheetByName("Maestro");
+      const datos = hoja.getRange("C2:F" + hoja.getLastRow()).getValues(); // Obtener datos desde la fila 2 hasta la última fila de las columnas C a F
+
+      for (let i = 0; i < datos.length; i++) {
+        if (datos[i][0] === sku) { // Comparar con la columna C (índice 0)
+          return datos[i][3]; // Devolver el valor de la columna F (índice 3)
+        }
+      }
+
+      throw new Error('No se encontró el SKU de origen en la hoja Maestro');
+    }
+  </script>
+</body>
+</html>
